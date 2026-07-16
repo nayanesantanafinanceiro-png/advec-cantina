@@ -1,11 +1,6 @@
-git init
-
-git add .
-
-git commit -m "Versão inicial do sistema"
-
-git branch -M main
-
-git remote add origin https://github.com/nayanesantanafinanceiro-png/advec-cantina.git
-
-git push -u origin main
+git clone https://github.com/nayanesantanafinanceiro-png/advec-cantina.git
+cd advec-cantina
+mv "index (1).html" index.html
+git add -A
+git commit -m "Corrige nome do arquivo principal"
+git push
