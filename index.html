@@ -380,8 +380,14 @@ function mapAuthError(e) {
     'auth/invalid-credential': 'E-mail ou senha incorretos.',
     'auth/email-already-in-use': 'Já existe uma conta com este e-mail.',
     'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
+    'auth/unauthorized-domain': 'Este site ainda não está autorizado no Firebase. No Firebase Console, vá em Authentication → Settings → Authorized domains e adicione o domínio deste site.',
+    'auth/operation-not-allowed': 'O login por e-mail/senha não está ativado no Firebase. No Firebase Console, vá em Authentication → Sign-in method e ative "E-mail/senha".',
+    'auth/configuration-not-found': 'O login por e-mail/senha não está configurado no Firebase. No Firebase Console, vá em Authentication → Sign-in method e ative "E-mail/senha".',
+    'auth/api-key-not-valid': 'A chave de configuração do Firebase é inválida. Verifique o firebaseConfig do projeto.',
+    'auth/network-request-failed': 'Falha de conexão. Verifique sua internet e tente novamente.',
+    'auth/too-many-requests': 'Muitas tentativas seguidas. Aguarde alguns minutos e tente novamente.',
   };
-  return map[e.code] || 'Ocorreu um erro. Tente novamente.';
+  return map[e.code] || `Ocorreu um erro (${e.code || 'desconhecido'}). Tente novamente.`;
 }
 
 /* ---------- gestão de usuários (somente master) ---------- */
@@ -1319,7 +1325,11 @@ auth.onAuthStateChanged(async (user) => {
     logAction('login', '');
     startDataSync();
   } catch (e) {
-    state.loadError = true;
+    console.error('Erro ao carregar/criar perfil do usuário:', e);
+    state.currentUser = null;
+    state.authNoProfile = false;
+    state.authError = 'Não foi possível acessar o banco de dados (' + (e.code || e.message || 'erro desconhecido') + '). Verifique as regras de segurança do Firebase Realtime Database — usuários autenticados precisam de permissão de leitura/escrita.';
+    try { await auth.signOut(); } catch (_) {}
   }
 
   document.getElementById('loading-screen').classList.add('hidden');
